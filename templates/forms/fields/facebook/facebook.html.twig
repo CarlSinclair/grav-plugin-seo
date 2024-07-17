@@ -232,7 +232,7 @@ function validatepage() {
   var protocol = location.protocol;
   var slashes = protocol.concat("//");
   var host = slashes.concat(window.location.hostname);
-  var structuredurl = "https://search.google.com/structured-data/testing-tool/u/0/#url="
+  var structuredurl = "https://search.google.com/test/rich-results?url={{ page_url|url_encode }}"
   var targeturl = $("[title|='{{ 'PLUGIN_ADMIN.PREVIEW'|tu }}']").attr("href");
   var strippedurl = targeturl.replace("/admin/preview","");
   var validateurl = structuredurl + encodeURIComponent(host + strippedurl);
