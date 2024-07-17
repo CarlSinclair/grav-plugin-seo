@@ -21,7 +21,7 @@ form:
                     header.googletitle:
                       type: text
                       label: PLUGIN_SEO.GOOGLE_TITLE
-                      id: text
+                      id: title
                     header.googledesc:
                       type: textarea
                       label: PLUGIN_SEO.GOOGLE_DESC
@@ -36,6 +36,10 @@ form:
                           0: PLUGIN_ADMIN.NO
                       validate:
                           type: bool
+                    header.googlekeywords:
+                      type: text
+                      label: PLUGIN_SEO.GOOGLE_KEYWORDS
+                      id: keywords
 
                     header.googlepreview:
                       type: google

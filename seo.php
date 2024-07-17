@@ -180,13 +180,17 @@ class seoPlugin extends Plugin
             $page->header()->displaytitle = $page->header()->title;  // Keep original title available for template use
             $page->header()->title = $page->header()->googletitle;
         };
+        if (isset($page->header()->googlekeywords)) {
+            $meta['keywords']['name']      = 'keywords';
+            $meta['keywords']['content']   = $page->header()->googlekeywords;
+        }
+        $meta['description']['name']      = 'description';
         if (isset($page->header()->googledesc)) {
-
+            
             $meta['description']['name']      = 'description';
             $meta['description']['content']   = $page->header()->googledesc;
-
+        
         } else {
-            $meta['description']['name']      = 'description';
             $meta['description']['content']   = $cleanedMarkdown;
         };
 
@@ -257,7 +261,8 @@ class seoPlugin extends Plugin
         }
          if (property_exists($page->header(),'facebookenable')){
          if ($page->header()->facebookenable == 'true') {
-
+         
+                //$meta['og:sitename']['name']        = 'og:sitename';
                 $meta['og:site_name']['property']    = 'og:site_name';
                 $meta['og:site_name']['content']     = $this->config->get('site.title');
             if (isset($page->header()->facebooktitle)) {
