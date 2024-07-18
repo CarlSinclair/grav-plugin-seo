@@ -1,75 +1,143 @@
 {% set settings = config.plugins.seo.header %}
 
+{% set fallbackImageUrl = url('/user/images/logo.jpg') %} 
+{% set imageUrl = page.header.article.image_url ?: fallbackImageUrl %}
 
-
-
-
-{# if settings.robots or page.header.robots is defined %}
+{% if settings.robots or page.header.robots is defined %}
 <meta name="robots" content="{{ page.header.robots|default(settings.robots)|default('index') }}">
-{% endif #}
+{% endif %}
 
-{#<meta name="author" content="">#}
-{# twitter #}
-
-{% if page.header.facebookenable != "0" %}
-<meta property="og:title" content="{% if page.header.facebooktitle is defined and not empty %}{{ page.header.facebooktitle }} {% else %}{{ page.title ~ " | " ~ site.title }}{% endif %}" />
+<meta property="og:title" content="{% if page.header.facebooktitle is defined and not empty %}{{ page.header.facebooktitle }} {% else %}{{ page.title ~ " | " ~ 'site_title'|t|raw }}{% endif %}" />
 <meta property="og:url" content="{{ page.url(true) }}" />
-{% if page.header.facebookimg %}
-<meta property="og:image" content="{% if not system.absolute_urls %}{{ uri.base()}}{% endif %}{{page.media[header.facebookimg].url(true)}}" />
-{% else %}
-<meta property="og:image" content="{% if not system.absolute_urls %}{{ uri.base()}}{% endif %}{{page.media.images|first.url(true)}}" />
-{% endif %}
 <meta property="og:description" content="{% if page.header.facebookdesc is defined and not empty %}{{ page.header.facebookdesc }} {% else %}{{ page.summary|striptags|truncate(300)|default(site.description) }}{% endif %}" />
-{% endif %}
+<meta property="og:image" content="{{ imageUrl }}" />
+<meta property="twitter:image" content="{{ imageUrl }}" />
 
+{# --- Aura-Inspired Schema Markup --- #}
 
-{% if header.articleenabled %}
-{% set fullimagepath = page.url(true) ~ "/" ~ header.article.image.url %}
-{% set fulllogopath = page.url(true) ~ "/" ~ header.article.publisher.logo.url %}
-{% set article = header.article|merge({'image' : {
-    'url': fullimagepath,
-    '@type': 'ImageObject',
-    'height': header.article.image.height,
-    'width': header.article.image.width
-    
-} }) %}
-{% set article = article|merge({'publisher': { '@type': 'Organization', 'name': header.article.publisher.name, 'logo':{'@type': 'ImageObject', 'url': fulllogopath } } }) %}
-<script  type="application/ld+json">
-{{ article|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }}
-</script>
-{% endif %}
-{% if header.personenabled %}
-<script  type="application/ld+json">
-{{ header.person|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }}
-</script>
-{% endif %}
-{% if header.eventenabled %}
-<script  type="application/ld+json">
-{{ header.event|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }}
-</script>
-{% endif %}
-{% if header.musicalbumenabled %}
-{% set fullalbumimgpath = page.url(true) ~ "/" ~ header.musicalbum.image %}
-{% set musicalbum = header.musicalbum|merge({'image' : fullalbumimgpath }) %}
-<script  type="application/ld+json">
-{{ musicalbum|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }}
-</script>
-{% endif %}
-{% if header.restaurantenabled %}
-{% set fullrestaurantimgpath = page.url(true) ~ "/" ~ header.restaurant.image %}
-{% set restaurant = header.restaurant|merge({'image' : fullrestaurantimgpath }) %}
-<script  type="application/ld+json">
-{{ restaurant|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }}
-</script>
-{% endif %}
-{% if header.musiceventenabled %}
-<script  type="application/ld+json">
-{% set musicevent = header.musicevent|merge({'startDate' : header.musicevent.startDate|date('c')}) %}
-{% set musicevent = musicevent|merge({'endDate' : header.musicevent.endDate|date('c')}) %}
+{% set homepageUrl = base_url_absolute %}
+{% set languageCode = grav.language.getActive %}
 
-{% set musiceventimgpath = page.url(true) ~ "/" ~ header.musicevent.image %}
-{% set musicevent = musicevent|merge({'image' : musiceventimgpath }) %}
-{{ musicevent|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|raw }}
-</script>
-{% endif %}
+{% set isBlogPost = page.template == 'item' %}
+{% set isBlogCategory = page.template == 'blog' and page.header.content.items is defined and page.header.content.items %}
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {# Organization Schema #}
+    {
+      "@type": "Organization",
+      "@id": "{{ homepageUrl }}#organization",
+      "name": "{{ 'site_title'|t|raw }}",
+      "url": "{{ homepageUrl }}/{{ languageCode }}@organization",
+      "logo": {
+        "@type": "ImageObject",
+        "@id": "{{ homepageUrl }}#logo",
+        "url": "{{ fallbackImageUrl }}"
+      }
+    },
+
+    {# Website Schema #}
+    {
+      "@type": "WebSite",
+      "@id": "{{ homepageUrl }}#website",
+      "url": "{{ homepageUrl }}",
+      "name": "{{ 'site_title'|t|raw }}",
+      "publisher": {
+        "@id": "{{ homepageUrl }}#organization"
+      }
+    },
+
+    {# WebPage Schema #}
+    {
+      "@type": "WebPage",
+      "@id": "{{ page.url(true) }}#webpage",
+      "url": "{{ page.url(true) }}",
+      "inLanguage": "{{ grav.language.getActive }}",
+      "name": "{{ page.title }}",
+      "isPartOf": {
+	"@type": "WebPage",
+        "@id": {% if isBlogPost %}
+                 "{{ page.parent.url(true) }}#webpage"
+               {% else %}
+                 "{{ homepageUrl }}/{{ languageCode }}#website"
+               {% endif %}
+      },
+      "datePublished": "{{ page.date|date('c') }}",
+      "dateModified": "{{ page.modified|date('c') }}",
+      "description": "{{ page.header.metadata.description|default(page.header.meta.description)|default(page.summary|striptags|truncate(160)) }}"
+    },
+
+    {# Article Schema #}
+{% do grav.language.setActive(grav.language.getActive) %}
+    {% if isBlogPost %}
+    {
+      "@type": "TechArticle",
+      "@id": "{{ page.url(true) }}#article",
+      "isPartOf": {
+        "@id": "{{ page.url(true) }}#webpage"
+      },
+      "headline": "{{ page.title }}",
+      "datePublished": "{{ page.date|date('c') }}",
+      "dateModified": "{{ page.modified|date('c') }}",
+      "toc": "#toc",
+      "mainEntityOfPage": {
+        "@id": "{{ page.url(true) }}#webpage"
+      },
+      "publisher": {
+        "@id": "{{ homepageUrl }}#organization"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "{{ author }}",
+	"url": "https://www.website.com#author"
+	"SameAs": [...
+	]
+    },
+      "image": {
+	"@type": "ImageObject",
+        "@id": "{{ page.url(true) }}#primaryimage",
+        "url": {% if page.header.article.image_url %} "{{ page.header.article.image_url }}" {% else %} "{{ fallbackImageUrl }}" {% endif %}
+      }
+}
+    {% endif %}
+  ]
+}
+</script>
+
+{# --- Breadcrumb Schema --- #}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "@id": "{{ homepageUrl }}#breadcrumb-home",
+      "name": "{{ 'site_title'|t }}",
+      "item": "{{ homepageUrl }}"
+    },
+    {% if isBlogCategory or isBlogPost %}
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "{{ page.parent.title }}",
+      "@id": "{{ page.parent.url(true) }}#breadcrumb-parent",
+      "item": "{{ page.parent.url(true) }}"
+    },
+    {% endif %}
+    {% if isBlogPost %}
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "@id": "{{ page.url(true) }}#breadcrumb-current",
+      "name": "{{ page.title }}",
+      "item": "{{ page.url(true) }}"
+    }
+    {% endif %}
+  ]
+}
+</script>
