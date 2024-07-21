@@ -186,10 +186,10 @@ class seoPlugin extends Plugin
         }
         $meta['description']['name']      = 'description';
         if (isset($page->header()->googledesc)) {
-            
+
             $meta['description']['name']      = 'description';
             $meta['description']['content']   = $page->header()->googledesc;
-        
+
         } else {
             $meta['description']['content']   = $cleanedMarkdown;
         };
@@ -200,6 +200,9 @@ class seoPlugin extends Plugin
 
         if (property_exists($page->header(),'twitterenable')) {
         if ($page->header()->twitterenable == 'true') {
+
+             // Get $siteTitle
+            $siteTitle = $this->config->get('site_title');
 
             if (isset($config['twitterid'])) {
                 $meta['twitter:site']['name']      = 'twitter:site';
@@ -217,13 +220,14 @@ class seoPlugin extends Plugin
             };
 
             if (isset($page->header()->twittertitle)) {
-                $meta['twitter:title']['name']      = 'twitter:title';
-                $meta['twitter:title']['property']  = 'twitter:title';
-                $meta['twitter:title']['content']   = $page->header()->twittertitle;
+//                $meta['twitter:title']['name']      = 'twitter:title';
+//                $meta['twitter:title']['property']  = 'twitter:title';
+//                $meta['twitter:title']['content']   = $page->header()->twittertitle;
             } else {
-                $meta['twitter:title']['name']      = 'twitter:title';
-                $meta['twitter:title']['property']  = 'twitter:title';
-                $meta['twitter:title']['content']   = $page->title() . ' | ' . $this->config->get('site.title');
+ //               $meta['twitter:title']['name']      = 'twitter:title';
+//                $meta['twitter:title']['property']  = 'twitter:title';
+//                $meta['twitter:title']['content']   = $page->title() . ' | ' . $this->config->get('site.title');
+//                $meta['twitter:title']['content']   = $page->title() . ' | ' . $siteTitle;
             };
             if (isset($page->header()->twitterdescription)) {
                 $meta['twitter:description']['name']      = 'twitter:description';
@@ -261,16 +265,20 @@ class seoPlugin extends Plugin
         }
          if (property_exists($page->header(),'facebookenable')){
          if ($page->header()->facebookenable == 'true') {
-         
+             // Get $siteTitle
+//	    $siteTitle = $this->config->get('site_title');
+
                 //$meta['og:sitename']['name']        = 'og:sitename';
-                $meta['og:site_name']['property']    = 'og:site_name';
-                $meta['og:site_name']['content']     = $this->config->get('site.title');
-            if (isset($page->header()->facebooktitle)) {
-                $meta['og:title']['property']       = 'og:title';
-                $meta['og:title']['content']        = $page->header()->facebooktitle;
+//                $meta['og:site_name']['property']    = 'og:site_name';
+//                $meta['og:site_name']['content']     = $this->config->get('site.title');
+//                $meta['og:site_name']['content']     = $siteTitle;
+          if (isset($page->header()->facebooktitle)) {
+//                $meta['og:title']['property']       = 'og:title';
+//                $meta['og:title']['content']        = $page->header()->facebooktitle;
+//                $meta['og:title']['content']        = $siteTitle;
             } else {
-                $meta['og:title']['property']       = 'og:title';
-                $meta['og:title']['content']        = $page->title();
+//                $meta['og:title']['property']       = 'og:title';
+//                $meta['og:title']['content']        = $page->title();
             }
             if (isset($config['facebookid'])) {
                 $meta['fb:app_id']['property']  = 'fb:app_id';
@@ -651,18 +659,50 @@ class seoPlugin extends Plugin
             } else {
                 $headline = $page->title();
             }
+    $config = $this->mergeConfig($page);
+
+    // Get $siteTitle
+    $siteTitle = $this->config->get('site_title');
+
+    // Get $baseUrl
+    $baseUrl = $this->grav['uri']->base();
+
+    // Get $pageUrl
+    $pageUrl = $page->url(true);
+
        if ($page->header()->articleenabled and $this->config['plugins']['seo']['article']) {
         $microdata['article']      = [
             '@context' => 'http://schema.org',
             '@type' => 'Article',
-            'headline' => @$headline ,
-            'mainEntityOfPage' => [
-                "@type" => "WebPage",
-                'url' => $this->grav['uri']->base(),
+                    '@id' => $pageUrl . '#article',
+            'isPartOf' => [
+                '@id' => $pageUrl . '#webpage'
             ],
-            'articleBody' =>  @$this->cleanMarkdown($content),
-            'datePublished' => @date("c", $page->date()),
-            'dateModified' => @date("c", $page->modified()),
+            'headline' => $page->title() . ' | ' . $siteTitle,
+            'datePublished' => date("c", $page->date()),
+            'dateModified' => date("c", $page->modified()),
+            'toc' => '#toc',
+            'mainEntityOfPage' => [
+                '@id' => $pageUrl . '#webpage'
+            ],
+            'publisher' => [
+                '@id' => $baseUrl . '#organization'
+            ],
+            'author' => [
+                '@type' => 'Person',
+                'name' => 'Carl Sinclair',
+                'url' => 'https://carl-sinclair.com#author',
+                'sameAs' => [
+                    'https://twitter.com/@BigCreativeNRG',
+                    'https://instagram.com/better.callcarl',
+                    'https://t.me/BigCreativeEnergy'
+                ]
+            ],
+            'image' => [
+                '@type' => 'ImageObject',
+                '@id' =>  $pageUrl . '#primaryimage',
+                'url' => isset($page->header()->article['image_url']) ? $page->header()->article['image_url'] : $baseUrl . '/user/images/logo.jpg'
+            ]
         ];
         if (isset($page->header()->article['description'])) {
             $microdata['article']['description'] = $page->header()->article['description'];
@@ -671,23 +711,7 @@ class seoPlugin extends Plugin
              $microdata['article']['description'] = substr($content,0,140);
            };
 
-         if (isset($page->header()->article['author'])) {
-            $microdata['article']['author'] = $page->header()->article['author'];
-           };
-           if (isset($page->header()->article['publisher_name'])) {
-            $microdata['article']['publisher']['@type'] = 'Organization';
-            $microdata['article']['publisher']['name'] = @$page->header()->article['publisher_name'];
-           };
-           if (isset($page->header()->article['publisher_logo_url'])) {
-            $publisherlogourl = $page->header()->article['publisher_logo_url'];
-            $imagedata = $this->seoGetimage($publisherlogourl);
-            $microdata['article']['publisher']['logo']['@type'] = 'ImageObject';
-            $microdata['article']['publisher']['logo']['url'] = $this->grav['uri']->base() . $imagedata['url'];
-            $microdata['article']['publisher']['logo']['width'] =  $imagedata['width'];
-            $microdata['article']['publisher']['logo']['height'] =  $imagedata['height'];
-
-           };
-           if (isset($page->header()->article['image_url'])) {
+         if (isset($page->header()->article['image_url'])) {
             $microdata['article']['image']['@type'] = 'ImageObject';
             $imageurl = $page->header()->article['image_url'];
             $imagedata = $this->seoGetimage($imageurl);
