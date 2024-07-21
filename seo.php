@@ -693,9 +693,7 @@ class seoPlugin extends Plugin
                 'name' => 'Carl Sinclair',
                 'url' => 'https://carl-sinclair.com#author',
                 'sameAs' => [
-                    'https://twitter.com/@BigCreativeNRG',
-                    'https://instagram.com/better.callcarl',
-                    'https://t.me/BigCreativeEnergy'
+...
                 ]
             ],
             'image' => [
