@@ -1,3 +1,13 @@
+**Note**: This version of the SEO plugin is obviously optimized for my website and its idiosyncrasies.
+
+My website is multilingual with one author, and the organization is the website itself. A langauge-coded homepage, blogs, and items under those blogs. If you go through the code I'm sure you can very easily adapt it for your use case.
+
+In its current state, it automatically generates complete and valid ```Schema``` for every single page on the website. Homepage, blogs, and items. In every language. It might not be completely plug and play if your website doesn't follow this structure.
+
+It also automatically generates some social tags like ```title```, ```type``` (article), ```URL```, and a fallback ```image``` (in ```/user/images/logo.jpg```). You can customize those in the admin backend (except for ```type```) and also add ```description``` and ```keywords``` through there. You can also have the Google description automatically override all other descriptions (except the main meta one. That's a #TODO).
+
+***One thing you definitely have to change is that I created a custom translatable string called ```site_title``` that I use to translate the name of my website. This variable will not work for you unless you explicitly create it.***
+
 # ![Grav SEO Plugin](https://github.com/paulmassen/grav-plugin-seo/blob/master/assets/logoseo.png?raw=true)
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MX77VZWPUKLTU)
