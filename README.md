@@ -1,12 +1,23 @@
-**Note**: This version of the SEO plugin is obviously optimized for my website and its idiosyncrasies.
+## This fork of the SEO plugin has additional functionality and is optimized for my website.
+My website is a multilingual blog with several categories and one author. The organization is set as the website itself. A localized homepage, blog categories, and items under those blog categories.
 
-My website is multilingual with one author, and the organization is the website itself. A langauge-coded homepage, blogs, and items under those blogs. If you go through the code I'm sure you can very easily adapt it for your use case.
+In its current state, it automatically generates complete and valid `schema` for every single page on the website. Homepage, blogs, and items. In every language. It might not be completely plug and play if your website doesn't follow this structure.
 
-In its current state, it automatically generates complete and valid ```Schema``` for every single page on the website. Homepage, blogs, and items. In every language. It might not be completely plug and play if your website doesn't follow this structure.
+It also automatically generates social tags like `title`, `type` (article/blog/website), `URL`, and a fallback `image` (in `/user/images/logo.jpg`). You can customize overrides in the admin backend (except for `type`) and also add `description` and Google `keywords` through there. You can also have the Google description automatically override all other descriptions (except the main one).
 
-It also automatically generates some social tags like ```title```, ```type``` (article), ```URL```, and a fallback ```image``` (in ```/user/images/logo.jpg```). You can customize those in the admin backend (except for ```type```) and also add ```description``` and ```keywords``` through there. You can also have the Google description automatically override all other descriptions (except the main meta one. That's a #TODO).
+***One thing you definitely have to change is that I created a custom translatable string called `site_title` that I use to translate the name of my website. This variable will not work for you unless you explicitly create it.***
 
-***One thing you definitely have to change is that I created a custom translatable string called ```site_title``` that I use to translate the name of my website. This variable will not work for you unless you explicitly create it.***
+There's no need to ever modify `schema` in the admin backend because it will be automatically generated, but you can. If you're like me and prefer to hard-code info that doesn't change (like `author`, `organizaation`, `logo`, and `SameAs`), then you only need to set it once and forget it.
+
+# TODO:
+- [x] Add `schema` for blog categories and blog posts.
+- [x] Automate addition of page title, site title, type, URL, and image tags for every page type.
+- [x] Multilingual support.
+- [x] Make Google description override all empty ones.
+- [ ] Apply Google description to the main meta description tag (not just social ones).
+- [ ] Google description sometimes not correctly overwriting other empty ones, leading to twitter card invalidation.
+- [ ] Check if page headers already contain tags to avoid duplicate tags.
+- [ ] Add support for `hreflang` tags
 
 # ![Grav SEO Plugin](https://github.com/paulmassen/grav-plugin-seo/blob/master/assets/logoseo.png?raw=true)
 
@@ -95,17 +106,6 @@ In order to use the plugin with a custom template, there is two requirements, yo
 
 As this plugin is in its early stage, please do not hesitate to leave a feedback, to suggest modification or features.
 
-### TO-DO
-
-- [ ] Add more Microdata type
-- [ ] Add Translations (Contribution welcomed!)
-- [x] Add the possibility to add multiple microdata of the same type
-- [ ] YoastSEO text analysis integration (WIP)
-- [ ] Add some microdata on every page
-
-
-
-
 ## Installation and Updates
 
 ### Updating from Previous releases
@@ -113,7 +113,7 @@ As this plugin is in its early stage, please do not hesitate to leave a feedback
 As there is a lot of changes from previous releases, be careful when updating, as your previously set values might be lost.
 The previous version required to modify your base template, whereas the 2.0+ version of the plugin now adds metadata and microdata automatically to your existing Installation.
 
-Installing or updating the `SEO` plugin can be done in one of three ways. Using the GPM (Grav Package Manager) installation update method (i.e. `bin/gpm install seo`) or manual install by downloading [this plugin](https://github.com/paulmassen/grav-plugin-seo) and extracting all plugin files to
+Installing or updating the `SEO` plugin can be done by downloading [this plugin](https://github.com/CarlSinclair/grav-plugin-seo) and extracting all plugin files to
 
     /your/site/grav/user/plugins/seo
 
