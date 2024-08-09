@@ -6,10 +6,24 @@
 <meta name="robots" content="{{ page.header.robots|default(settings.robots)|default('index') }}">
 <meta property="og:url" content="{{ page.url(true) }}" /> 
 <meta property="og:image" content="{{ imageUrl }}" />
+
+{% autoescape false %}
 <meta property="og:title" content="{{ page.title }} | {{ 'site_title'|t }}" />
 <meta property="og:site_name" content="{{ 'site_title'|t }}" />
 <meta name="twitter:image" content="{{ imageUrl }}" />
 <meta name="twitter:title" content="{{ page.title }} | {{ 'site_title'|t }}" />
+{% endautoescape %}
+
+{% set locale = grav.language.getLanguage() %}
+{% if locale == 'es' %}
+    <meta property="og:locale" content="es" />
+{% elseif locale == 'pt-br' %}
+    <meta property="og:locale" content="pt_BR" />
+{% elseif locale == 'ar' %}
+    <meta property="og:locale" content="ar" />
+{% else %}
+    <meta property="og:locale" content="en" />
+{% endif %}
 
 {# --- Aura-Inspired Schema Markup --- #}
 
