@@ -14,6 +14,14 @@
 <meta name="twitter:title" content="{{ page.title }} | {{ 'site_title'|t }}" />
 {% endautoescape %}
 
+{% if isBlogPost %}
+    <meta property="og:type" content="article" />
+{% elseif isBlogCategory %}
+    <meta property="og:type" content="blog" />
+{% else %}
+    <meta property="og:type" content="website" />
+{% endif %}
+
 {% set locale = grav.language.getLanguage() %}
 {% if locale == 'es' %}
     <meta property="og:locale" content="es" />
